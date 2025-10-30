@@ -1,38 +1,29 @@
-<!-- template -->
-
-const readline = require("readline");
-
-function mulberry32(seed) {
-  let t = seed >>> 0;
-  return function() {
-    t += 0x6D2B79F5;
-    let r = Math.imul(t ^ (t >>> 15), t | 1);
-    r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
-    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-const rng = mulberry32(1);
-
-const moves = ["N", "S", "E", "W"];
-let firstTick = true;
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  terminal: false
-});
+let firstTick = true
+const moves = ["N","E","S","W"]
 
 rl.on("line", (line) => {
-  const data = JSON.parse(line);
+    const data = JSON.parse(line);
 
-  if (firstTick) {
-    const { width, height } = data.config;
-    console.error(`Random walker (Node.js) launching on a ${width}x${height} map`);
-  }
+    if (firstTick){
+        const { width, height } = data.config;
+        console.error(`The evermoving one is dropped on a ${width}x${height} arena, sponsored by Raid Shadow Legends.`);
+    }
 
-  const move = moves[Math.floor(rng() * moves.length)];
-  console.log(move);
+    var [posX, posY] = data.bot;
+    var [diaX, diaY] = data.visible_gems[0].position;
 
-  firstTick = false;
+    while(data.visible_gems[0].ttl > 0){
+        var disX = posX - diaX;
+        var disY = posY - diaY
+
+        if(disX < 0 && Math.abs(disX) > Math.abs(disY)){
+            console.log("E");
+        } else if(disX > 0 && Math.abs(disX) > Math.abs(disY)){
+            console.log("W");
+        } else if(disY > 0 && Math.abs(disX) < Math.abs(disY)){
+            console.log("S");
+        } else if(disY < 0 && Math.abs(disX) < Math.abs(disY)){
+            console.log("N");
+        };
+    };
 });
